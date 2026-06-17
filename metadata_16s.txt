@@ -1,0 +1,28 @@
+ASVID	Treatment	Compartment	Treatment_Compartment	Legend
+CR1	Control	Rhizosphere	Control_Rhizosphere	Control
+CR2	Control	Rhizosphere	Control_Rhizosphere	Control
+CR3	Control	Rhizosphere	Control_Rhizosphere	Control
+LR1	Leaf	Rhizosphere	Leaf_Rhizosphere	Leaf inoculation
+LR2	Leaf	Rhizosphere	Leaf_Rhizosphere	Leaf inoculation
+LR3	Leaf	Rhizosphere	Leaf_Rhizosphere	Leaf inoculation
+RR1	Roots	Rhizosphere	Roots_Rhizosphere	Root inoculation
+RR2	Roots	Rhizosphere	Roots_Rhizosphere	Root inoculation
+RR3	Roots	Rhizosphere	Roots_Rhizosphere	Root inoculation
+CE1	Control	Endorhizosphere	Control_Endorhizosphere	Control
+CE2	Control	Endorhizosphere	Control_Endorhizosphere	Control
+CE3	Control	Endorhizosphere	Control_Endorhizosphere	Control
+LE1	Leaf	Endorhizosphere	Leaf_Endorhizosphere	Leaf inoculation
+LE2	Leaf	Endorhizosphere	Leaf_Endorhizosphere	Leaf inoculation
+LE3	Leaf	Endorhizosphere	Leaf_Endorhizosphere	Leaf inoculation
+RE1	Roots	Endorhizosphere	Roots_Endorhizosphere	Root inoculation
+RE2	Roots	Endorhizosphere	Roots_Endorhizosphere	Root inoculation
+RE3	Roots	Endorhizosphere	Roots_Endorhizosphere	Root inoculation
+CX1	Control	Xylem	Control_Xylem	Control
+CX2	Control	Xylem	Control_Xylem	Control
+CX3	Control	Xylem	Control_Xylem	Control
+LX1	Leaf	Xylem	Leaf_Xylem	Leaf inoculation
+LX2	Leaf	Xylem	Leaf_Xylem	Leaf inoculation
+LX3	Leaf	Xylem	Leaf_Xylem	Leaf inoculation
+RX1	Roots	Xylem	Roots_Xylem	Root inoculation
+RX2	Roots	Xylem	Roots_Xylem	Root inoculation
+RX3	Roots	Xylem	Roots_Xylem	Root inoculation
