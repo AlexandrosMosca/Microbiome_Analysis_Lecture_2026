@@ -1,4 +1,4 @@
-library("phyloseq") # carico Phyloseq
+library("phyloseq") # Phyloseq
 library("dplyr")
 library("tidyr") 
 library("ggplot2")
