@@ -4,15 +4,15 @@ library("tidyr")
 library("ggplot2")
 library("cowplot")
 library("rstatix") # PostHoc test (alpha-diversity)
-library("vegan") # PERMANOVA test
+library("vegan") # PERMANOVA test (beta-diversity)
 
 ############Analisi###############
 
 # Path della working directory
-setwd("C:/Users/alexa/OneDrive/Documenti/Documenti vari/2026/Lezioni/lm7_maggio/Biotecnologie Fitopatologiche - Materiale esercitazione R")
+setwd("your_path")
 
 # Phyloseq----------------------------------------------------------------------------------------------------------------
-#Carico l'ASV table e preparo i file
+#Load the ASV table with taxonomy
 ASVtable <- read.csv(file = "16S_ASVTable.txt", sep = "\t")
 
 colnames(ASVtable)
@@ -37,7 +37,7 @@ ASVtable_Taxa <- as.matrix(ASVtable_Taxa)
 TAXA <- tax_table(ASVtable_Taxa)
 
 MAP <- read.csv(file = "metadata_16s.txt", sep = "\t")
-#MAP$Terminal <- NULL
+
 
 rownames(MAP) <- MAP$ASVID
 MAP$X.ASV.ID <- NULL
@@ -45,15 +45,15 @@ MAP <- sample_data(MAP)
 
 data_ps <- merge_phyloseq(OTU, TAXA, MAP)
 
-# Filtraggio: Voglio vedere i mitocondri e cloroplasti
+# Filtering to observe mitochondria & chloroplasts
 data_ps_CLORO_MITO <- subset_taxa(data_ps, Order == "Chloroplast" | Family == "Mitochondria")
 data_ps_CLORO_MITO
 
-# Filtraggio: Considero tutto ciò che è stato identificato come batterio, scartando Mitochondria e Chloroplast
+# Filtering to observe all the bacterial communities
 data_ps <- subset_taxa(data_ps, Order != "Chloroplast" & Family != "Mitochondria")
 data_ps
 
-# Ordino il nome delle variabili "Compartment"
+# Order the element of the variable "Compartment"
 data_ps@sam_data$Compartment <- factor(
   data_ps@sam_data$Compartment,
   levels = c("Rhizosphere", "Endorhizosphere", "Xylem")
@@ -150,91 +150,91 @@ write.table(finalTable_lev6_REL, file = "16Data_Genus.txt", sep = "\t",
 ### 1.3. Plot - Mean relative abundances ###
 
 # 1.3.1. PHYLUM
-df_phylum_media <- data_ps_lev2_REL %>%
-  psmelt() %>%                                         # Converte l'oggetto phyloseq in dataframe
-  group_by(Treatment_Compartment, Phylum) %>%                           # Raggruppa per tesi allo studio e phylum
+df_phylum_mean <- data_ps_lev2_REL %>%
+  psmelt() %>%                                         
+  group_by(Treatment_Compartment, Phylum) %>%                           
   summarize(Mean_Relative_Abundance = mean(Abundance), .groups = 'drop') %>%
-  mutate(Phylum = ifelse(Mean_Relative_Abundance < 1, "Other taxa (< 1%)", Phylum)) #Setto il valore soglia
+  mutate(Phylum = ifelse(Mean_Relative_Abundance < 1, "Other taxa (< 1%)", Phylum)) 
   #summarize(Mean_Relative_Abundance = sum(Mean_Relative_Abundance), .groups = 'drop') %>%
   #pivot_wider(names_from = Phylum, values_from = Mean_Relative_Abundance, values_fill = 0)
 
 
 #Ordering the feature table according the treatment variables
-df_phylum_media$Treatment_Compartment <- factor(
-  df_phylum_media$Treatment_Compartment,
+df_phylum_mean$Treatment_Compartment <- factor(
+  df_phylum_mean$Treatment_Compartment,
   levels = c("Control_Rhizosphere", "Leaf_Rhizosphere", "Roots_Rhizosphere",
              "Control_Endorhizosphere", "Leaf_Endorhizosphere", "Roots_Endorhizosphere",
              "Control_Xylem", "Leaf_Xylem", "Roots_Xylem")
 )
 
 #Plot  
-grafico_16S_phylum <- ggplot(df_phylum_media, aes(x = Treatment_Compartment, y = Mean_Relative_Abundance, fill = Phylum)) +
+plot_16S_phylum <- ggplot(df_phylum_mean, aes(x = Treatment_Compartment, y = Mean_Relative_Abundance, fill = Phylum)) +
   geom_bar(stat = "identity", position = "stack") +
   theme_minimal() +
   labs(y = "Rel. abundance (%)", x = "Samples") +
   scale_fill_brewer(palette = "Set3") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 10))
 
-grafico_16S_phylum
+plot_16S_phylum
 
-# 1.3.2 FAMIGLIA
-df_family_media <- data_ps_lev5_REL %>%
+# 1.3.2 FAMILY
+df_family_mean <- data_ps_lev5_REL %>%
   psmelt() %>%                                         # Converte l'oggetto phyloseq in dataframe
   group_by(Treatment_Compartment, Family) %>%                           # Raggruppa per tesi e phylum
   summarize(Mean_Relative_Abundance = mean(Abundance), .groups = 'drop') %>%
   mutate(Family = ifelse(Mean_Relative_Abundance < 5, "Other taxa (< 5%)", Family))
 
 
-df_family_media$Treatment_Compartment <- factor(
-  df_family_media$Treatment_Compartment,
+df_family_mean$Treatment_Compartment <- factor(
+  df_family_mean$Treatment_Compartment,
   levels = c("Control_Rhizosphere", "Leaf_Rhizosphere", "Roots_Rhizosphere",
              "Control_Endorhizosphere", "Leaf_Endorhizosphere", "Roots_Endorhizosphere",
              "Control_Xylem", "Leaf_Xylem", "Roots_Xylem")
 )
 
 #Plot
-grafico_16S_family <- ggplot(df_family_media, aes(x = Treatment_Compartment, y = Mean_Relative_Abundance, fill = Family)) +
+plot_16S_family <- ggplot(df_family_mean, aes(x = Treatment_Compartment, y = Mean_Relative_Abundance, fill = Family)) +
   geom_bar(stat = "identity", position = "stack") +
   theme_minimal() +
   labs(y = "Rel. abundance (%)", x = "Samples") +
   scale_fill_viridis_d(option = "H") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 10))
 
-grafico_16S_family
+plot_16S_family
 
-grafici_16S_MERGED <- plot_grid(grafico_16S_phylum, grafico_16S_family,
+plot_16S_MERGED <- plot_grid(plot_16S_phylum, plot_16S_family,
                                rel_widths = c(1, 1), labels = "AUTO")
 
-grafici_16S_MERGED
+plot_16S_MERGED
 
 ggsave2(plot = grafici_16S_MERGED,
-       filename = "grafico_16S_RELATIVE.jpeg",
+       filename = "plot_16S_RELATIVE.jpeg",
        width = 14,
        height = 8.50,
        dpi = 300)
 
-########################2. Alfa diversità-------------------------------------------------------------------------
+########################2. Alpha-diversity-------------------------------------------------------------------------
 
-#2.1. Risultato tabulare
+#2.1. Tabular result
 
 data_alpha <- estimate_richness(data_ps)
 
 write.table(data_alpha, file = "output_alpha.txt", sep = "\t")
 
-#2.2. Grafico
+#2.2. Plot
 
-#Opzione A
-data_alpha_grafico_OBS <- plot_richness(data_ps, measures=c("Observed"),
+#Option A
+data_alpha_plot_OBS <- plot_richness(data_ps, measures=c("Observed"),
                                     x="Compartment", color="Treatment") +
   facet_grid("Treatment")
 
-data_alpha_grafico_OBS
+data_alpha_plot_OBS
 
-data_alpha_grafico_SHAN <- plot_richness(data_ps, measures=c("Shannon"),
+data_alpha_plot_SHAN <- plot_richness(data_ps, measures=c("Shannon"),
                                     x="Compartment", color="Treatment") +
   facet_grid("Treatment")
 
-data_alpha_grafico_SHAN
+data_alpha_plot_SHAN
 #Opzione B
 # Boxplot
 metadata <- read.csv(file = "metadata_16s.txt", sep = "\t")
@@ -263,7 +263,7 @@ data_alpha_ggplot2_SHANNON <- ggplot(data = data_alpha_metadata,
 
 data_alpha_ggplot2_SHANNON
 
-#UNIAMO I DUE GRAFICI
+#MERGE
 data_alpha_ggplot2_OBSERVED_SHANNON <- plot_grid(data_alpha_ggplot2_OBSERVED,
                                                  data_alpha_ggplot2_SHANNON,
                                                  labels = "AUTO",
@@ -298,7 +298,7 @@ ggsave(filename = "beta_div.jpeg",
 #############STATISTICA############
 
 #1. Alpha Diversity
-#Esempio basato sull'indice Observed
+#Example on richness values
 shapiro.test(data_alpha_metadata$Observed)
 kruskal.test(Observed ~ Treatment_Compartment, data = data_alpha_metadata)
 
