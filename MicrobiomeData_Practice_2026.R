@@ -179,8 +179,8 @@ plot_16S_phylum
 
 # 1.3.2 FAMILY
 df_family_mean <- data_ps_lev5_REL %>%
-  psmelt() %>%                                         # Converte l'oggetto phyloseq in dataframe
-  group_by(Treatment_Compartment, Family) %>%                           # Raggruppa per tesi e phylum
+  psmelt() %>%                                        
+  group_by(Treatment_Compartment, Family) %>%                           
   summarize(Mean_Relative_Abundance = mean(Abundance), .groups = 'drop') %>%
   mutate(Family = ifelse(Mean_Relative_Abundance < 5, "Other taxa (< 5%)", Family))
 
